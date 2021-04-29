@@ -2,6 +2,11 @@ const express = require('express');
 const pool = require('./db');
 const Joi = require('joi');
 const app = express();
+const cors = require("cors");
+
+
+app.use(cors()
+); 
 app.use(express.json()); // for parsing application/json
 
 
@@ -33,8 +38,8 @@ app.post('/api/users', async(req,res) => {
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO users (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5) RETURNING *',[user.first_name,user.last_name,user.email,user.password,user.role]);
-        res.json(users.rows[0]);
+        const users = await pool.query('INSERT INTO users (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5)',[user.first_name,user.last_name,user.email,user.password,user.role]);
+        res.json('Record Added Sucesfully');
     } catch (error) {
         res.json(error.message);
     }
@@ -73,7 +78,7 @@ function validateUser(user) {
         last_name: Joi.string().min(3).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
-        role: Joi.string().required()
+        role: Joi.required()
     })
 
     return schema.validate(user);
