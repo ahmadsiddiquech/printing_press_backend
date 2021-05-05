@@ -1,19 +1,41 @@
+//libraries
+
 const express = require('express');
-const pool = require('./db');
+const pool = require('./config/db');
 const Joi = require('joi');
 const app = express();
 const cors = require("cors");
+const { sign } = require('jsonwebtoken');
+const { genSaltSync,hashSync,compareSync } = require('bcrypt')
+
+//libraries end
 
 
-app.use(cors()
-); 
-app.use(express.json()); // for parsing application/json
+// app main function starts
 
+app.use(cors()); 
+app.use(express.json());
+
+// app main function end
+
+// users registrtion api's start
 
 app.get('/api/users', async(req,res) => {
     try {
-        const users = await pool.query('SELECT * FROM users ORDER BY id asc');
-        res.json(users.rows);
+        const users = await pool.query('SELECT id,first_name,last_name,email,role,active,password FROM users ORDER BY id asc');
+        if(users.rowCount >= 1){
+            res.json({
+                success:true,
+                message:"",
+                data:users.rows
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Record Not Found",
+                data:""
+            });
+        }
     } catch (error) {
         res.json(error.message);
     }
@@ -22,8 +44,20 @@ app.get('/api/users', async(req,res) => {
 app.get('/api/users/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT FROM users WHERE id = $1',[id]);
-        res.json(users.rows[0]);
+        const users = await pool.query('SELECT id,first_name,last_name,email,role,active FROM users WHERE id = $1',[id]);
+        if(users.rowCount >= 1){
+            res.json({
+                success:true,
+                message:"",
+                data:users.rows[0]
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Record Not Found",
+                data:""
+            });
+        }
     } catch (error) {
         res.json(error.message);
     }
@@ -38,8 +72,21 @@ app.post('/api/users', async(req,res) => {
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO users (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5)',[user.first_name,user.last_name,user.email,user.password,user.role]);
-        res.json('Record Added Sucesfully');
+        user.password = hashSync(user.password,salt);
+        const users = await pool.query('INSERT INTO users (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5) returning id,first_name,last_name,role,email',[user.first_name,user.last_name,user.email,user.password,user.role]);
+        if(users.rowCount >= 1){
+            res.json({
+                success:true,
+                message:"Registration Succesfull",
+                data:users.rows[0]
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Registration Failed",
+                data:""
+            });
+        }
     } catch (error) {
         res.json(error.message);
     }
@@ -54,8 +101,20 @@ app.put('/api/users/:id', async(req,res) => {
         for (const [key, value] of Object.entries(user)) {
             cols.push(key + " = '" + value + "'");
         }
-        const update = await pool.query("UPDATE users SET " + cols.join(', ') + " WHERE id = $1",[id]);
-        res.json("Record Updated Succesfully");
+        const update = await pool.query("UPDATE users SET " + cols.join(', ') + " WHERE id = $1 returning first_name,last_name,role,email",[id]);
+        if(users.rowCount >= 1){
+            res.json({
+                success:true,
+                message:"Record Updated Succesfully",
+                data:users.rows[0]
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Update Failed",
+                data:""
+            });
+        }
     } catch (error) {
         res.json(error.message);
     }
@@ -65,12 +124,62 @@ app.delete('/api/users/:id', async(req,res) => {
     try {
         const id = req.params.id;
         const del = await pool.query('DELETE FROM users WHERE id = $1',[id]);
-        res.json("User Deleted succesfully");
+        res.json({
+            success:true,
+            message:"User Deleted Succesfully",
+            data:""
+        });
     } catch (error) {
         res.json(error.message);
     }
 });
 
+// users registrtion api's end
+
+// user login api's start
+
+app.post('/api/login', async(req,res) => {
+    try {
+        const login = req.body;
+        const validation = validateLogin(login);
+        
+        if(validation.error){
+            res.status(400).json(validation.error.details[0].message);
+            return;
+        }
+
+        
+        const data = await pool.query('SELECT * FROM users WHERE email = $1',[login.email]);
+        // const result = compareSync(login.password,data.password);
+        const result = true;
+        if(result){
+            const jsontoken = sign({ result:result }, "qwe123" ,{
+                expiresIn : "1h"
+            });
+            res.json({
+                success:true,
+                message:"Login Succesfull",
+                token:jsontoken,
+                data:result.rows[0]
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Invalid email or password",
+                data:""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+// user login api's end
+
+
+
+
+// validation functions start
 
 function validateUser(user) {
     const schema =  Joi.object({
@@ -85,5 +194,17 @@ function validateUser(user) {
 }
 
 
+function validateLogin(user) {
+    const schema =  Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).required()
+    })
+
+    return schema.validate(user);
+}
+//validation function ends
+
+// server start
+const salt = genSaltSync(10);
 const port = process.env.port || 3000;
 app.listen(port, () => console.log(`Listning on port ${port}..`));
