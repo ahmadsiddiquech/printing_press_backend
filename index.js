@@ -150,25 +150,37 @@ app.post('/api/login', async(req,res) => {
 
         
         const data = await pool.query('SELECT * FROM users WHERE email = $1',[login.email]);
-        // const result = compareSync(login.password,data.password);
-        const result = true;
-        if(result){
-            const jsontoken = sign({ result:result }, "qwe123" ,{
-                expiresIn : "1h"
-            });
-            res.json({
-                success:true,
-                message:"Login Succesfull",
-                token:jsontoken,
-                data:result.rows[0]
-            });
+        if(data.rowCount >= 1){
+            const result = compareSync(login.password,data.rows[0].password);
+            if(result){
+                data.rows[0].re
+                delete data.rows[0]["password"];
+                const jsontoken = sign({ result:result }, "hsah" ,{
+                    expiresIn : "1h"
+                });
+                res.json({
+                    success:true,
+                    message:"Login Succesfull",
+                    token:jsontoken,
+                    data:data.rows[0]
+                });
+            }else{
+                res.json({
+                    success:false,
+                    message:"Invalid email or password",
+                    token:"",
+                    data:""
+                });
+            }
         }else{
             res.json({
                 success:false,
                 message:"Invalid email or password",
+                token:"",
                 data:""
             });
         }
+        
     } catch (error) {
         res.json(error.message);
     }
