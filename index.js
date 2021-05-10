@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.get('/api/users', async(req,res) => {
     try {
-        const users = await pool.query('SELECT id,first_name,last_name,email,role,active,password FROM users ORDER BY id asc');
+        const users = await pool.query('SELECT id,first_name,last_name,email,role,active,password FROM "users" ORDER BY id asc');
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -44,7 +44,7 @@ app.get('/api/users', async(req,res) => {
 app.get('/api/users/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT id,first_name,last_name,email,role,active FROM users WHERE id = $1',[id]);
+        const users = await pool.query('SELECT id,first_name,last_name,email,role,active FROM "users" WHERE id = $1',[id]);
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -73,8 +73,9 @@ app.post('/api/users', async(req,res) => {
             return;
         }
         user.password = hashSync(user.password,salt);
-        const users = await pool.query('INSERT INTO users (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5) returning id,first_name,last_name,role,email',[user.first_name,user.last_name,user.email,user.password,user.role]);
+        const users = await pool.query('INSERT INTO "users" (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5) returning *',[user.first_name,user.last_name,user.email,user.password,user.role]);
         if(users.rowCount >= 1){
+            delete users.rows[0]["password"];
             res.json({
                 success:true,
                 message:"Registration Succesfull",
@@ -101,12 +102,13 @@ app.put('/api/users/:id', async(req,res) => {
         for (const [key, value] of Object.entries(user)) {
             cols.push(key + " = '" + value + "'");
         }
-        const update = await pool.query("UPDATE users SET " + cols.join(', ') + " WHERE id = $1 returning first_name,last_name,role,email",[id]);
-        if(users.rowCount >= 1){
+        const update = await pool.query("UPDATE users SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
+        if(update.rowCount >= 1){
+            delete update.rows[0]["password"];
             res.json({
                 success:true,
                 message:"Record Updated Succesfully",
-                data:users.rows[0]
+                data:update.rows[0]
             });
         }else{
             res.json({
@@ -123,7 +125,7 @@ app.put('/api/users/:id', async(req,res) => {
 app.delete('/api/users/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const del = await pool.query('DELETE FROM users WHERE id = $1',[id]);
+        const del = await pool.query('DELETE FROM "users" WHERE id = $1',[id]);
         res.json({
             success:true,
             message:"User Deleted Succesfully",
@@ -149,7 +151,7 @@ app.post('/api/login', async(req,res) => {
         }
 
         
-        const data = await pool.query('SELECT * FROM users WHERE email = $1',[login.email]);
+        const data = await pool.query('SELECT * FROM "users" WHERE email = $1',[login.email]);
         if(data.rowCount >= 1){
             const result = compareSync(login.password,data.rows[0].password);
             if(result){
