@@ -1,5 +1,6 @@
 CREATE DATABASE printing_press;
-
+----------------------------------------------------------
+----------------------------------------------------------
 CREATE TABLE users(
     id serial primary key,
     first_name varchar(255),
@@ -11,3 +12,16 @@ CREATE TABLE users(
 );
 
 ALTER TABLE users ALTER COLUMN active SET DEFAULT 0;
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE admin(
+    id serial primary key,
+    first_name varchar(255),
+    last_name varchar(255),
+    email varchar(255),
+    password varchar(255),
+    role varchar(255),
+    active int
+);
+
+ALTER TABLE admin ALTER COLUMN active SET DEFAULT 0;
