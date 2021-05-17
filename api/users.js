@@ -1,10 +1,13 @@
 //libraries
 const express = require('express');
 const pool = require('../config/db.js');
+
 const { sign } = require('jsonwebtoken');
-const {genSaltSync,hashSync,compareSync} = require('bcrypt');
+const { genSaltSync,hashSync,compareSync } = require('bcrypt');
 const Joi = require('joi');
 const router = express.Router();
+const upload_url = "E:/Angular/printingshop/uploads/images/"
+
 
 //libraries end
 
@@ -14,7 +17,7 @@ const salt = genSaltSync(10);
 
 router.get('/', async(req,res) => {
     try {
-        const users = await pool.query('SELECT id,first_name,last_name,email,role,active,password FROM "users" ORDER BY id asc');
+        const users = await pool.query('SELECT * FROM "users" ORDER BY id asc');
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -36,7 +39,7 @@ router.get('/', async(req,res) => {
 router.get('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT id,first_name,last_name,email,role,active FROM "users" WHERE id = $1',[id]);
+        const users = await pool.query('SELECT id,first_name,last_name,email,role,active,image FROM "users" WHERE id = $1',[id]);
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -95,6 +98,50 @@ router.put('/:id', async(req,res) => {
             cols.push(key + " = '" + value + "'");
         }
         const update = await pool.query("UPDATE users SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
+        if(update.rowCount >= 1){
+            delete update.rows[0]["password"];
+            res.json({
+                success:true,
+                message:"Record Updated Succesfully",
+                data:update.rows[0]
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Update Failed",
+                data:""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.put('/upload_image/:id', async(req,res) => {
+    try {
+        const id = req.params.id;
+
+        let sampleFile;
+        let uploadPath;
+
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({
+                success:false,
+                message:"Record Not Updated",
+                data:""
+            });
+        }
+
+        sampleFile = req.files.image;
+        uploadPath = upload_url + sampleFile.name;
+
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv(uploadPath, function(err) {
+            if (err){
+                return res.status(500).send(err);
+            }
+        });
+        const update = await pool.query("UPDATE users SET image = $1 WHERE id = $2 returning *",[sampleFile.name,id]);
         if(update.rowCount >= 1){
             delete update.rows[0]["password"];
             res.json({

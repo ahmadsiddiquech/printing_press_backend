@@ -12,6 +12,9 @@ CREATE TABLE users(
 );
 
 ALTER TABLE users ALTER COLUMN active SET DEFAULT 0;
+ALTER TABLE users ADD COLUMN image varchar;
+
+
 ----------------------------------------------------------
 ----------------------------------------------------------
 CREATE TABLE admin(
