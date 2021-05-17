@@ -6,8 +6,8 @@ const { sign } = require('jsonwebtoken');
 const { genSaltSync,hashSync,compareSync } = require('bcrypt');
 const Joi = require('joi');
 const router = express.Router();
-const upload_url = "E:/Angular/printingshop/uploads/images/"
-
+const upload_url = "E:/Angular/printingshop/uploads/images/";
+const front_server_url = "http://localhost:4200/";
 
 //libraries end
 
@@ -19,6 +19,7 @@ router.get('/', async(req,res) => {
     try {
         const users = await pool.query('SELECT * FROM "users" ORDER BY id asc');
         if(users.rowCount >= 1){
+            users.rows[0].image = (users.rows[0].image != null) ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",
@@ -41,6 +42,7 @@ router.get('/:id', async(req,res) => {
         const id = req.params.id;
         const users = await pool.query('SELECT id,first_name,last_name,email,role,active,image FROM "users" WHERE id = $1',[id]);
         if(users.rowCount >= 1){
+            users.rows[0].image = (users.rows[0].image != null) ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",
