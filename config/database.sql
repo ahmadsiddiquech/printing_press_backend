@@ -28,3 +28,15 @@ CREATE TABLE admin(
 );
 
 ALTER TABLE admin ALTER COLUMN active SET DEFAULT 0;
+
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE categories(
+    id serial primary key,
+    category varchar(255),
+    description varchar(255),
+    image varchar(255),
+    active int DEFAULT 0
+);
+
+ALTER TABLE categories ALTER COLUMN active SET DEFAULT 0;
