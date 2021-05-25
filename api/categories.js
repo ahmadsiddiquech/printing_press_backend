@@ -16,7 +16,7 @@ router.get('/', async(req,res) => {
         const users = await pool.query('SELECT * FROM "categories" ORDER BY id asc');
         if(users.rowCount >= 1){
             users.rows.forEach(element => {
-                element.image = (element.image == null) ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${element.image}`;
+                element.image = (element.image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${element.image}`;
             });
             // users.rows[0].image = (users.rows[0].image == null) ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
@@ -41,7 +41,7 @@ router.get('/:id', async(req,res) => {
         const id = req.params.id;
         const users = await pool.query('SELECT id,category,description,image,active FROM "categories" WHERE id = $1',[id]);
         if(users.rowCount >= 1){
-            users.rows[0].image = (users.rows[0].image == null) ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
+            users.rows[0].image = (users.rows[0].image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",
