@@ -8,11 +8,9 @@ CREATE TABLE users(
     email varchar(255),
     password varchar(255),
     role varchar(255),
-    active int
+    last_name varchar(255),
+    active int DEFAULT 0
 );
-
-ALTER TABLE users ALTER COLUMN active SET DEFAULT 0;
-ALTER TABLE users ADD COLUMN image varchar;
 
 
 ----------------------------------------------------------
@@ -24,10 +22,8 @@ CREATE TABLE admin(
     email varchar(255),
     password varchar(255),
     role varchar(255),
-    active int
+    active int DEFAULT 0
 );
-
-ALTER TABLE admin ALTER COLUMN active SET DEFAULT 0;
 
 ----------------------------------------------------------
 ----------------------------------------------------------
@@ -39,4 +35,38 @@ CREATE TABLE categories(
     active int DEFAULT 0
 );
 
-ALTER TABLE categories ALTER COLUMN active SET DEFAULT 0;
+
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE subcategories(
+    id serial primary key,
+    category_id int,
+    name varchar(255),
+    description varchar(255),
+    image varchar(255),
+    active int DEFAULT 0
+);
+
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE finishingoptions(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    active int DEFAULT 0
+);
+
+
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE products(
+    id serial primary key,
+    category_id int,
+    subcategory_id int,
+    finishingoptions_id int,
+    name varchar(255),
+    description varchar(255),
+    image varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);

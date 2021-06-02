@@ -13,7 +13,7 @@ const front_server_url = "http://localhost:4200/";
 
 router.get('/', async(req,res) => {
     try {
-        const users = await pool.query('SELECT * FROM "subcategories" ORDER BY id asc');
+        const users = await pool.query('SELECT subcategories.*,categories.category FROM "subcategories" LEFT JOIN "categories" ON subcategories.category_id=categories.id ORDER BY subcategories.id asc');
         if(users.rowCount >= 1){
             users.rows.forEach(element => {
                 element.image = (element.image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${element.image}`;
@@ -39,7 +39,7 @@ router.get('/', async(req,res) => {
 router.get('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT id,name,description,image,active FROM "subcategories" WHERE id = $1',[id]);
+        const users = await pool.query('SELECT subcategories.*,categories.category FROM "subcategories" LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE subcategories.id = $1',[id]);
         if(users.rowCount >= 1){
             users.rows[0].image = (users.rows[0].image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
@@ -68,7 +68,7 @@ router.post('/', async(req,res) => {
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO "subcategories" (category,description) VALUES ($1,$2) returning *',[user.category,user.description]);
+        const users = await pool.query('INSERT INTO "subcategories" (category_id,name,description,active) VALUES ($1,$2,$3,$4) returning *',[user.category_id,user.name,user.description,user.active]);
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -98,7 +98,6 @@ router.put('/:id', async(req,res) => {
         }
         const update = await pool.query("UPDATE subcategories SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
         if(update.rowCount >= 1){
-            delete update.rows[0]["password"];
             res.json({
                 success:true,
                 message:"Record Updated Succesfully",
@@ -140,7 +139,7 @@ router.put('/upload_image/:id', async(req,res) => {
                 return res.status(500).send(err);
             }
         });
-        const update = await pool.query("UPDATE subcategories SET image = $1 WHERE id = $2 returning *",[sampleFile.name,id]);
+        const update = await pool.query("UPDATE subcategories SET image = $1 WHERE id = $2",[sampleFile.name,id]);
         if(update.rowCount >= 1){
             res.json({
                 success:true,
@@ -186,8 +185,10 @@ router.delete('/:id', async(req,res) => {
 
 function validateSubcategory(user) {
     const schema =  Joi.object({
-        subcategory: Joi.string().required(),
-        description: Joi.string().required()
+        name: Joi.string().required(),
+        category_id: Joi.number().required(),
+        description: Joi.string().required(),
+        active: Joi.number()
     })
     return schema.validate(user);
 }

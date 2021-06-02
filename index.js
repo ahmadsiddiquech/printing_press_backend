@@ -13,12 +13,16 @@ const usersRoutes = require('./api/users.js');
 const adminRoutes = require('./api/admin.js');
 const categoriesRoutes = require('./api/categories.js');
 const subcategoriesRoutes = require('./api/subcategories.js');
+const finishingoptionsRoutes = require('./api/finishingoptions.js');
+const productsRoutes = require('./api/products.js');
 
 
 app.use('/api/users',usersRoutes);
 app.use('/api/admin',adminRoutes);
 app.use('/api/categories',categoriesRoutes);
 app.use('/api/subcategories',subcategoriesRoutes);
+app.use('/api/finishingoptions',finishingoptionsRoutes);
+app.use('/api/products',productsRoutes);
 
 
 const port = process.env.port || 3000;

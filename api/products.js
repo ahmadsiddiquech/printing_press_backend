@@ -13,7 +13,11 @@ const front_server_url = "http://localhost:4200/";
 
 router.get('/', async(req,res) => {
     try {
-        const users = await pool.query('SELECT * FROM "categories" ORDER BY id asc');
+        const users = await pool.query(`SELECT products.*,categories.category,subcategories.name as subcategory,finishingoptions.name as finishoption FROM "products"
+         LEFT JOIN "finishingoptions" ON products.finishingoptions_id=finishingoptions.id 
+         LEFT JOIN "subcategories" ON products.subcategory_id=subcategories.id 
+         LEFT JOIN "categories" ON subcategories.category_id=categories.id 
+         ORDER BY products.id asc`);
         if(users.rowCount >= 1){
             users.rows.forEach(element => {
                 element.image = (element.image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${element.image}`;
@@ -39,7 +43,11 @@ router.get('/', async(req,res) => {
 router.get('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT * FROM "categories" WHERE id = $1',[id]);
+        const users = await pool.query(`SELECT products.*,categories.category,subcategories.name as subcategory,finishingoptions.name as finishoption FROM "products"
+        LEFT JOIN "finishingoptions" ON product.finishoption_id=finishingoptions.id 
+        LEFT JOIN "subcategories" ON product.subcategory_id=subcategories.id 
+        LEFT JOIN "categories" ON subcategories.category_id=categories.id 
+        WHERE subcategories.id = $1`,[id]);
         if(users.rowCount >= 1){
             users.rows[0].image = (users.rows[0].image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
@@ -62,13 +70,13 @@ router.get('/:id', async(req,res) => {
 router.post('/', async(req,res) => {
     try {
         const user = req.body;
-        const result = validateCategory(user);
+        const result = validateProduct(user);
         
         if(result.error){
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO "categories" (category,description) VALUES ($1,$2) returning *',[user.category,user.description]);
+        const users = await pool.query('INSERT INTO "products" (category_id,subcategory_id,finishingoptions_id,name,price,description,active) VALUES ($1,$2,$3,$4,$5,$6,$7) returning *',[user.category_id,user.subcategory_id,user.finishingoptions_id,user.name,user.price,user.description,user.active]);
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -96,7 +104,7 @@ router.put('/:id', async(req,res) => {
         for (const [key, value] of Object.entries(user)) {
             cols.push(key + " = '" + value + "'");
         }
-        const update = await pool.query("UPDATE categories SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
+        const update = await pool.query("UPDATE subcategories SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
         if(update.rowCount >= 1){
             res.json({
                 success:true,
@@ -139,7 +147,7 @@ router.put('/upload_image/:id', async(req,res) => {
                 return res.status(500).send(err);
             }
         });
-        const update = await pool.query("UPDATE categories SET image = $1 WHERE id = $2 returning *",[sampleFile.name,id]);
+        const update = await pool.query("UPDATE subcategories SET image = $1 WHERE id = $2",[sampleFile.name,id]);
         if(update.rowCount >= 1){
             res.json({
                 success:true,
@@ -161,7 +169,7 @@ router.put('/upload_image/:id', async(req,res) => {
 router.delete('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('DELETE FROM "categories" WHERE id = $1',[id]);
+        const users = await pool.query('DELETE FROM "subcategories" WHERE id = $1',[id]);
         if(users.rowCount > 0){
             res.json({
                 success:true,
@@ -183,12 +191,16 @@ router.delete('/:id', async(req,res) => {
 
 // users registrtion api's end
 
-function validateCategory(user) {
+function validateProduct(user) {
     const schema =  Joi.object({
-        category: Joi.string().required(),
-        description: Joi.string().required()
+        name: Joi.string().required(),
+        price: Joi.string().required(),
+        category_id: Joi.number().required(),
+        subcategory_id: Joi.number().required(),
+        finishingoptions_id: Joi.number().required(),
+        description: Joi.string().required(),
+        active: Joi.number()
     })
-
     return schema.validate(user);
 }
 

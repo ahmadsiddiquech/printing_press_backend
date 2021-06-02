@@ -4,8 +4,6 @@ const pool = require('../config/db.js');
 const Joi = require('joi');
 
 const router = express.Router();
-const upload_url = "E:/Angular/printingshop/uploads/images/";
-const front_server_url = "http://localhost:4200/";
 
 //libraries end
 
@@ -13,12 +11,8 @@ const front_server_url = "http://localhost:4200/";
 
 router.get('/', async(req,res) => {
     try {
-        const users = await pool.query('SELECT * FROM "categories" ORDER BY id asc');
+        const users = await pool.query('SELECT finishingoptions.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "finishingoptions" LEFT JOIN "subcategories" ON finishingoptions.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id ORDER BY finishingoptions.id asc');
         if(users.rowCount >= 1){
-            users.rows.forEach(element => {
-                element.image = (element.image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${element.image}`;
-            });
-            // users.rows[0].image = (users.rows[0].image == null) ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",
@@ -39,9 +33,8 @@ router.get('/', async(req,res) => {
 router.get('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT * FROM "categories" WHERE id = $1',[id]);
+        const users = await pool.query('SELECT finishingoptions.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "finishingoptions" LEFT JOIN "subcategories" ON finishingoptions.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE finishingoptions.id = $1',[id]);
         if(users.rowCount >= 1){
-            users.rows[0].image = (users.rows[0].image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",
@@ -62,13 +55,14 @@ router.get('/:id', async(req,res) => {
 router.post('/', async(req,res) => {
     try {
         const user = req.body;
-        const result = validateCategory(user);
+        delete user.category_id;
+        const result = validateFinishingoptions(user);
         
         if(result.error){
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO "categories" (category,description) VALUES ($1,$2) returning *',[user.category,user.description]);
+        const users = await pool.query('INSERT INTO "finishingoptions" (subcategory_id,name,active) VALUES ($1,$2,$3) returning *',[user.subcategory_id,user.name,user.active]);
         if(users.rowCount >= 1){
             res.json({
                 success:true,
@@ -91,55 +85,13 @@ router.put('/:id', async(req,res) => {
     try {
         const id = req.params.id;
         var user = req.body;
+        delete user.category_id;
 
         var cols = [];
         for (const [key, value] of Object.entries(user)) {
             cols.push(key + " = '" + value + "'");
         }
-        const update = await pool.query("UPDATE categories SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
-        if(update.rowCount >= 1){
-            res.json({
-                success:true,
-                message:"Record Updated Succesfully",
-                data:update.rows[0]
-            });
-        }else{
-            res.json({
-                success:false,
-                message:"Update Failed",
-                data:""
-            });
-        }
-    } catch (error) {
-        res.json(error.message);
-    }
-});
-
-router.put('/upload_image/:id', async(req,res) => {
-    try {
-        const id = req.params.id;
-
-        let sampleFile;
-        let uploadPath;
-
-        if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).json({
-                success:false,
-                message:"Record Not Updated",
-                data:""
-            });
-        }
-
-        sampleFile = req.files.image;
-        uploadPath = upload_url + sampleFile.name;
-
-        // Use the mv() method to place the file somewhere on your server
-        sampleFile.mv(uploadPath, function(err) {
-            if (err){
-                return res.status(500).send(err);
-            }
-        });
-        const update = await pool.query("UPDATE categories SET image = $1 WHERE id = $2 returning *",[sampleFile.name,id]);
+        const update = await pool.query("UPDATE finishingoptions SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
         if(update.rowCount >= 1){
             res.json({
                 success:true,
@@ -161,7 +113,7 @@ router.put('/upload_image/:id', async(req,res) => {
 router.delete('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('DELETE FROM "categories" WHERE id = $1',[id]);
+        const users = await pool.query('DELETE FROM "finishingoptions" WHERE id = $1',[id]);
         if(users.rowCount > 0){
             res.json({
                 success:true,
@@ -183,12 +135,12 @@ router.delete('/:id', async(req,res) => {
 
 // users registrtion api's end
 
-function validateCategory(user) {
+function validateFinishingoptions(user) {
     const schema =  Joi.object({
-        category: Joi.string().required(),
-        description: Joi.string().required()
+        name: Joi.string().required(),
+        subcategory_id: Joi.number().required(),
+        active: Joi.number()
     })
-
     return schema.validate(user);
 }
 
