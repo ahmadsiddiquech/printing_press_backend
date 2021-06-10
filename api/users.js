@@ -44,8 +44,9 @@ router.get('/:id', async(req,res) => {
     try {
         const id = req.params.id;
         const users = await pool.query('SELECT id,first_name,last_name,email,role,active,image FROM "users" WHERE id = $1',[id]);
+        
         if(users.rowCount >= 1){
-            users.rows[0].image = (users.rows[0].image == null || element.image == '') ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
+            users.rows[0].image = (users.rows[0].image == null || users.rows[0].image == '') ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",

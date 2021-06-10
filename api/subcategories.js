@@ -41,11 +41,36 @@ router.get('/:id', async(req,res) => {
         const id = req.params.id;
         const users = await pool.query('SELECT subcategories.*,categories.category FROM "subcategories" LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE subcategories.id = $1',[id]);
         if(users.rowCount >= 1){
-            users.rows[0].image = (users.rows[0].image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
+            users.rows[0].image = (users.rows[0].image == null || users.rows[0].image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success:true,
                 message:"",
                 data:users.rows[0]
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Record Not Found",
+                data:""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.get('/get_subcategory_by_category/:id', async(req,res) => {
+    try {
+        const id = req.params.id;
+        const users = await pool.query('SELECT subcategories.*,categories.category FROM "subcategories" LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE subcategories.category_id = $1',[id]);
+        if(users.rowCount >= 1){
+            users.rows.forEach(element => {
+                element.image = (element.image == null || element.image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${element.image}`;
+            });
+            res.json({
+                success:true,
+                message:"",
+                data:users.rows
             });
         }else{
             res.json({
