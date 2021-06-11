@@ -104,7 +104,7 @@ router.put('/:id', async(req,res) => {
         for (const [key, value] of Object.entries(user)) {
             cols.push(key + " = '" + value + "'");
         }
-        const update = await pool.query("UPDATE subcategories SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
+        const update = await pool.query("UPDATE products SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
         if(update.rowCount >= 1){
             res.json({
                 success:true,
@@ -140,14 +140,15 @@ router.put('/upload_image/:id', async(req,res) => {
 
         sampleFile = req.files.image;
         uploadPath = upload_url + sampleFile.name;
-
+        
         // Use the mv() method to place the file somewhere on your server
         sampleFile.mv(uploadPath, function(err) {
             if (err){
                 return res.status(500).send(err);
             }
         });
-        const update = await pool.query("UPDATE subcategories SET image = $1 WHERE id = $2",[sampleFile.name,id]);
+        
+        const update = await pool.query("UPDATE products SET image = $1 WHERE id = $2",[sampleFile.name,id]);
         if(update.rowCount >= 1){
             res.json({
                 success:true,
@@ -169,7 +170,7 @@ router.put('/upload_image/:id', async(req,res) => {
 router.delete('/:id', async(req,res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('DELETE FROM "subcategories" WHERE id = $1',[id]);
+        const users = await pool.query('DELETE FROM "products" WHERE id = $1',[id]);
         if(users.rowCount > 0){
             res.json({
                 success:true,
@@ -195,6 +196,7 @@ function validateProduct(user) {
     const schema =  Joi.object({
         name: Joi.string().required(),
         price: Joi.string().required(),
+        image: Joi.string().required(),
         category_id: Joi.number().required(),
         subcategory_id: Joi.number().required(),
         finishingoptions_id: Joi.number().required(),

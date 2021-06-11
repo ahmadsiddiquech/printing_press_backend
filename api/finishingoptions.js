@@ -52,6 +52,30 @@ router.get('/:id', async(req,res) => {
     }
 });
 
+router.get('/get_finishingoption_by_subcategory/:id', async(req,res) => {
+    try {
+        const id = req.params.id;
+        const users = await pool.query('SELECT finishingoptions.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "finishingoptions" LEFT JOIN "subcategories" ON finishingoptions.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE finishingoptions.subcategory_id = $1',[id]);
+        if(users.rowCount >= 1){
+            res.json({
+                success:true,
+                message:"",
+                data:users.rows
+            });
+        }else{
+            res.json({
+                success:false,
+                message:"Record Not Found",
+                data:""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+
+
 router.post('/', async(req,res) => {
     try {
         const user = req.body;
