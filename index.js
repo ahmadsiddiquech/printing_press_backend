@@ -14,6 +14,13 @@ const adminRoutes = require('./api/admin.js');
 const categoriesRoutes = require('./api/categories.js');
 const subcategoriesRoutes = require('./api/subcategories.js');
 const finishingoptionsRoutes = require('./api/finishingoptions.js');
+const additionaloptionsRoutes = require('./api/additionaloptions.js');
+const unfoldedsizeRoutes = require('./api/unfoldedsize.js');
+const foldingstyleRoutes = require('./api/foldingstyle.js');
+const printedsidesRoutes = require('./api/printedsides.js');
+const papertypeRoutes = require('./api/papertype.js');
+const paperweightRoutes = require('./api/paperweight.js');
+
 const productsRoutes = require('./api/products.js');
 
 
@@ -22,6 +29,13 @@ app.use('/api/admin',adminRoutes);
 app.use('/api/categories',categoriesRoutes);
 app.use('/api/subcategories',subcategoriesRoutes);
 app.use('/api/finishingoptions',finishingoptionsRoutes);
+app.use('/api/additionaloptions',additionaloptionsRoutes);
+app.use('/api/unfoldedsize',unfoldedsizeRoutes);
+app.use('/api/foldingstyle',foldingstyleRoutes);
+app.use('/api/printedsides',printedsidesRoutes);
+app.use('/api/papertype',papertypeRoutes);
+app.use('/api/paperweight',paperweightRoutes);
+
 app.use('/api/products',productsRoutes);
 
 

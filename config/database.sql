@@ -53,9 +53,74 @@ CREATE TABLE finishingoptions(
     id serial primary key,
     subcategory_id int,
     name varchar(255),
+    price varchar(255),
     active int DEFAULT 0
 );
 
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE additionaloptions(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);
+
+----------------------------------------------------------
+----------------------------------------------------------
+
+CREATE TABLE unfoldedsize(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);
+
+----------------------------------------------------------
+----------------------------------------------------------
+
+CREATE TABLE printedsides(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);
+
+----------------------------------------------------------
+----------------------------------------------------------
+
+CREATE TABLE papertype(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);
+
+----------------------------------------------------------
+----------------------------------------------------------
+
+CREATE TABLE paperweight(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);
+
+----------------------------------------------------------
+----------------------------------------------------------
+
+CREATE TABLE foldingstyle(
+    id serial primary key,
+    subcategory_id int,
+    name varchar(255),
+    price varchar(255),
+    active int DEFAULT 0
+);
 
 ----------------------------------------------------------
 ----------------------------------------------------------
@@ -63,10 +128,19 @@ CREATE TABLE products(
     id serial primary key,
     category_id int,
     subcategory_id int,
-    finishingoptions_id int,
     name varchar(255),
     description varchar(255),
     image varchar(255),
     price varchar(255),
     active int DEFAULT 0
+);
+
+ 
+
+----------------------------------------------------------
+----------------------------------------------------------
+CREATE TABLE product_finishingoption(
+    id serial primary key,
+    product_id int,
+    finishingoptions_id int
 );
