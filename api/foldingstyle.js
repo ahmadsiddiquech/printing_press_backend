@@ -9,20 +9,20 @@ const router = express.Router();
 
 // users registrtion api's start
 
-router.get('/', async(req,res) => {
+router.get('/', async (req, res) => {
     try {
         const users = await pool.query('SELECT foldingstyle.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "foldingstyle" LEFT JOIN "subcategories" ON foldingstyle.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id ORDER BY foldingstyle.id asc');
-        if(users.rowCount >= 1){
+        if (users.rowCount >= 1) {
             res.json({
-                success:true,
-                message:"",
-                data:users.rows
+                success: true,
+                message: "",
+                data: users.rows
             });
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:"Record Not Found",
-                data:""
+                success: false,
+                message: "Record Not Found",
+                data: ""
             });
         }
     } catch (error) {
@@ -30,21 +30,21 @@ router.get('/', async(req,res) => {
     }
 });
 
-router.get('/:id', async(req,res) => {
+router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT foldingstyle.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "foldingstyle" LEFT JOIN "subcategories" ON foldingstyle.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE foldingstyle.id = $1',[id]);
-        if(users.rowCount >= 1){
+        const users = await pool.query('SELECT foldingstyle.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "foldingstyle" LEFT JOIN "subcategories" ON foldingstyle.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE foldingstyle.id = $1', [id]);
+        if (users.rowCount >= 1) {
             res.json({
-                success:true,
-                message:"",
-                data:users.rows[0]
+                success: true,
+                message: "",
+                data: users.rows[0]
             });
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:"Record Not Found",
-                data:""
+                success: false,
+                message: "Record Not Found",
+                data: ""
             });
         }
     } catch (error) {
@@ -52,21 +52,21 @@ router.get('/:id', async(req,res) => {
     }
 });
 
-router.get('/get_additionaloption_by_subcategory/:id', async(req,res) => {
+router.get('/get_additionaloption_by_subcategory/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT foldingstyle.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "foldingstyle" LEFT JOIN "subcategories" ON foldingstyle.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE foldingstyle.subcategory_id = $1',[id]);
-        if(users.rowCount >= 1){
+        const users = await pool.query('SELECT foldingstyle.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "foldingstyle" LEFT JOIN "subcategories" ON foldingstyle.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE foldingstyle.subcategory_id = $1', [id]);
+        if (users.rowCount >= 1) {
             res.json({
-                success:true,
-                message:"",
-                data:users.rows
+                success: true,
+                message: "",
+                data: users.rows
             });
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:"Record Not Found",
-                data:""
+                success: false,
+                message: "Record Not Found",
+                data: ""
             });
         }
     } catch (error) {
@@ -76,28 +76,28 @@ router.get('/get_additionaloption_by_subcategory/:id', async(req,res) => {
 
 
 
-router.post('/', async(req,res) => {
+router.post('/', async (req, res) => {
     try {
         const user = req.body;
         delete user.category_id;
         const result = validateFoldingstyle(user);
-        
-        if(result.error){
+
+        if (result.error) {
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO "foldingstyle" (subcategory_id,name,active,price) VALUES ($1,$2,$3,$4) returning *',[user.subcategory_id,user.name,user.active,user.price]);
-        if(users.rowCount >= 1){
+        const users = await pool.query('INSERT INTO "foldingstyle" (subcategory_id,name,active,price) VALUES ($1,$2,$3,$4) returning *', [user.subcategory_id, user.name, user.active, user.price]);
+        if (users.rowCount >= 1) {
             res.json({
-                success:true,
-                message:" Succesfull",
-                data:users.rows[0]
+                success: true,
+                message: " Succesfull",
+                data: users.rows[0]
             });
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:" Failed",
-                data:""
+                success: false,
+                message: " Failed",
+                data: ""
             });
         }
     } catch (error) {
@@ -105,7 +105,7 @@ router.post('/', async(req,res) => {
     }
 });
 
-router.put('/:id', async(req,res) => {
+router.put('/:id', async (req, res) => {
     try {
         const id = req.params.id;
         var user = req.body;
@@ -115,18 +115,18 @@ router.put('/:id', async(req,res) => {
         for (const [key, value] of Object.entries(user)) {
             cols.push(key + " = '" + value + "'");
         }
-        const update = await pool.query("UPDATE foldingstyle SET " + cols.join(', ') + " WHERE id = $1 returning *",[id]);
-        if(update.rowCount >= 1){
+        const update = await pool.query("UPDATE foldingstyle SET " + cols.join(', ') + " WHERE id = $1 returning *", [id]);
+        if (update.rowCount >= 1) {
             res.json({
-                success:true,
-                message:"Record Updated Succesfully",
-                data:update.rows[0]
+                success: true,
+                message: "Record Updated Succesfully",
+                data: update.rows[0]
             });
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:"Update Failed",
-                data:""
+                success: false,
+                message: "Update Failed",
+                data: ""
             });
         }
     } catch (error) {
@@ -134,24 +134,24 @@ router.put('/:id', async(req,res) => {
     }
 });
 
-router.delete('/:id', async(req,res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('DELETE FROM "foldingstyle" WHERE id = $1',[id]);
-        if(users.rowCount > 0){
+        const users = await pool.query('DELETE FROM "foldingstyle" WHERE id = $1', [id]);
+        if (users.rowCount > 0) {
             res.json({
-                success:true,
-                message:" Deleted Succesfully",
-                data:""
+                success: true,
+                message: " Deleted Succesfully",
+                data: ""
             });
-        }else{
+        } else {
             res.json({
-                success:false,
-                message:"Not Deleted",
-                data:""
+                success: false,
+                message: "Not Deleted",
+                data: ""
             });
         }
-        
+
     } catch (error) {
         res.json(error.message);
     }
@@ -160,7 +160,7 @@ router.delete('/:id', async(req,res) => {
 // users registrtion api's end
 
 function validateFoldingstyle(user) {
-    const schema =  Joi.object({
+    const schema = Joi.object({
         name: Joi.string().required(),
         subcategory_id: Joi.number().required(),
         price: Joi.string().required(),

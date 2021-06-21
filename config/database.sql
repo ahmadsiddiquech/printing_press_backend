@@ -131,11 +131,11 @@ CREATE TABLE products(
     name varchar(255),
     description varchar(255),
     image varchar(255),
-    price varchar(255),
+    -- price varchar(255),
     active int DEFAULT 0
 );
 
- 
+ ALTER TABLE products DROP price;
 
 ----------------------------------------------------------
 ----------------------------------------------------------
@@ -143,4 +143,25 @@ CREATE TABLE product_finishingoption(
     id serial primary key,
     product_id int,
     finishingoptions_id int
+);
+
+---------------------------------------------------------
+---------------------------------------------------------
+
+CREATE TABLE product_options(
+    id serial primary key,
+    p_id int,
+    product_id int,
+    product_type varchar(255),
+    quantity varchar(255),
+    finishing_size varchar(255),
+    printed_pages varchar(255),
+    stock varchar(255),
+    cover varchar(255),
+    lamination varchar(255),
+    one_day varchar(255),
+    two_day varchar(255),
+    three_day varchar(255),
+    seven_day varchar(255),
+    vat varchar(255)
 );
