@@ -150,8 +150,8 @@ CREATE TABLE product_finishingoption(
 
 CREATE TABLE product_options(
     id serial primary key,
-    p_id int,
-    product_id int,
+    p_id varchar(255),
+    product_id varchar(255),
     product_type varchar(255),
     quantity varchar(255),
     finishing_size varchar(255),
@@ -165,3 +165,6 @@ CREATE TABLE product_options(
     seven_day varchar(255),
     vat varchar(255)
 );
+
+ALTER TABLE product_options
+ALTER COLUMN p_id TYPE varchar(255);

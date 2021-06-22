@@ -20,23 +20,25 @@ const foldingstyleRoutes = require('./api/foldingstyle.js');
 const printedsidesRoutes = require('./api/printedsides.js');
 const papertypeRoutes = require('./api/papertype.js');
 const paperweightRoutes = require('./api/paperweight.js');
+const productoptionsRoutes = require('./api/productoptions.js');
 
 const productsRoutes = require('./api/products.js');
 
 
-app.use('/api/users',usersRoutes);
-app.use('/api/admin',adminRoutes);
-app.use('/api/categories',categoriesRoutes);
-app.use('/api/subcategories',subcategoriesRoutes);
-app.use('/api/finishingoptions',finishingoptionsRoutes);
-app.use('/api/additionaloptions',additionaloptionsRoutes);
-app.use('/api/unfoldedsize',unfoldedsizeRoutes);
-app.use('/api/foldingstyle',foldingstyleRoutes);
-app.use('/api/printedsides',printedsidesRoutes);
-app.use('/api/papertype',papertypeRoutes);
-app.use('/api/paperweight',paperweightRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/subcategories', subcategoriesRoutes);
+app.use('/api/finishingoptions', finishingoptionsRoutes);
+app.use('/api/additionaloptions', additionaloptionsRoutes);
+app.use('/api/unfoldedsize', unfoldedsizeRoutes);
+app.use('/api/foldingstyle', foldingstyleRoutes);
+app.use('/api/printedsides', printedsidesRoutes);
+app.use('/api/papertype', papertypeRoutes);
+app.use('/api/paperweight', paperweightRoutes);
+app.use('/api/productoptions', productoptionsRoutes);
 
-app.use('/api/products',productsRoutes);
+app.use('/api/products', productsRoutes);
 
 
 const port = process.env.port || 3000;
