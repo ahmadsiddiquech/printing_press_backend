@@ -16,7 +16,7 @@ global.__basedir = __dirname;
 
 router.post('/upload_csv/', async (req, res) => {
     try {
-        var result;
+        let result;
         if (req.files.file == undefined) {
             return res.status(400).send({
                 message: "Please upload a CSV file!"
@@ -64,7 +64,6 @@ router.post('/upload_csv/', async (req, res) => {
                         message: "Could not upload the file: " + req.files.file.name,
                     });
                 }
-
             })
             .on("end", async () => {
                 if (result.rowCount >= 1) {
@@ -92,7 +91,7 @@ router.post('/upload_csv/', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const users = await pool.query('SELECT * FROM "product_options" ORDER BY product_options.id asc');
+        const users = await pool.query('SELECT * FROM "product_options" ORDER BY product_options.id asc LIMIT 25');
         if (users.rowCount >= 1) {
             res.json({
                 success: true,
@@ -133,48 +132,22 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.get('/get_additionaloption_by_subcategory/:id', async (req, res) => {
-    try {
-        const id = req.params.id;
-        const users = await pool.query('SELECT product_options.*,categories.category,categories.id as category_id,subcategories.name as subcategory FROM "product_options" LEFT JOIN "subcategories" ON product_options.subcategory_id=subcategories.id LEFT JOIN "categories" ON subcategories.category_id=categories.id WHERE product_options.subcategory_id = $1', [id]);
-        if (users.rowCount >= 1) {
-            res.json({
-                success: true,
-                message: "",
-                data: users.rows
-            });
-        } else {
-            res.json({
-                success: false,
-                message: "Record Not Found",
-                data: ""
-            });
-        }
-    } catch (error) {
-        res.json(error.message);
-    }
-});
-
-
-
-
 
 router.post('/', async (req, res) => {
     try {
         const user = req.body;
-        delete user.category_id;
-        const result = validateProductoptions(user);
+        // const result = validateProductoptions(user);
 
-        if (result.error) {
-            res.status(400).json(result.error.details[0].message);
-            return;
-        }
-        const users = await pool.query('INSERT INTO "product_options" (subcategory_id,name,active,price) VALUES ($1,$2,$3,$4) returning *', [user.subcategory_id, user.name, user.active, user.price]);
-        if (users.rowCount >= 1) {
+        // if (result.error) {
+        //     res.status(400).json(result.error.details[0].message);
+        //     return;
+        // }
+        result = await pool.query('INSERT INTO "product_options" (p_id,product_id,product_type,quantity,finishing_size,printed_pages,stock,cover,lamination,one_day,two_day,three_day,seven_day,vat) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)', [user.p_id, user.product_id, user.product_type, user.quantity, user.finishing_size, user.printed_pages, user.stock, user.cover, user.lamination, user.one_day, user.two_day, user.three_day, user.seven_day, user.vat]);
+        if (result.rowCount >= 1) {
             res.json({
                 success: true,
                 message: " Succesfull",
-                data: users.rows[0]
+                data: result.rows[0]
             });
         } else {
             res.json({
