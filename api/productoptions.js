@@ -66,6 +66,7 @@ router.post('/upload_csv/', async (req, res) => {
                 }
             })
             .on("end", async () => {
+                const users = await pool.query('DELETE FROM "product_options" WHERE id = "P ID"', [id]);
                 if (result.rowCount >= 1) {
                     res.json({
                         success: true,
