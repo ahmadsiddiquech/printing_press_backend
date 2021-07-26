@@ -46,16 +46,12 @@ router.get('/:id', async (req, res) => {
          LEFT JOIN "subcategories" ON products.subcategory_id=subcategories.id 
          LEFT JOIN "categories" ON subcategories.category_id=categories.id 
          WHERE products.id = $1`, [id]);
-        const f_options = await pool.query(`SELECT finishingoptions.* FROM "finishingoptions"
-         LEFT JOIN "product_finishingoption" ON product_finishingoption.finishingoptions_id=finishingoptions.id 
-         WHERE product_finishingoption.product_id = $1`, [id]);
         if (users.rowCount >= 1) {
             users.rows[0].image = (users.rows[0].image == null || users.rows[0].image == '') ? `${front_server_url}assets/images/placeholder.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
             res.json({
                 success: true,
                 message: "",
-                data: users.rows[0],
-                f_options: f_options.rows
+                data: users.rows[0]
             });
         } else {
             res.json({
@@ -199,6 +195,153 @@ router.delete('/:id', async (req, res) => {
             });
         }
 
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.get('/product_finishing_size/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const f_options = await pool.query(`SELECT finishing_size FROM "product_options" WHERE p_id = $1 GROUP BY finishing_size`, [id]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.post('/product_printed_pages/', async (req, res) => {
+    try {
+        const id = req.body.id;
+        const f_size = req.body.f_size;
+        const f_options = await pool.query(`SELECT printed_pages FROM "product_options" WHERE p_id = $1 and finishing_size = $2 GROUP BY printed_pages`, [id, f_size]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.post('/product_stocks/', async (req, res) => {
+    try {
+        const id = req.body.id;
+        const f_size = req.body.f_size;
+        const p_page = req.body.p_page;
+        const f_options = await pool.query(`SELECT stock FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 GROUP BY stock`, [id, f_size, p_page]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.post('/product_covers/', async (req, res) => {
+    try {
+        const id = req.body.id;
+        const f_size = req.body.f_size;
+        const p_page = req.body.p_page;
+        const p_stock = req.body.p_stock;
+        const f_options = await pool.query(`SELECT cover FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 GROUP BY cover`, [id, f_size, p_page, p_stock]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.post('/product_laminations/', async (req, res) => {
+    try {
+        const id = req.body.id;
+        const f_size = req.body.f_size;
+        const p_page = req.body.p_page;
+        const p_stock = req.body.p_stock;
+        const p_cover = req.body.p_cover;
+        const f_options = await pool.query(`SELECT lamination FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 GROUP BY lamination`, [id, f_size, p_page, p_stock, p_cover]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.post('/product_prices/', async (req, res) => {
+    try {
+        const id = req.body.id;
+        const f_size = req.body.f_size;
+        const p_page = req.body.p_page;
+        const p_stock = req.body.p_stock;
+        const p_cover = req.body.p_cover;
+        const p_lamination = req.body.p_lamination;
+        const f_options = await pool.query(`SELECT one_day FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 GROUP BY one_day`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
     } catch (error) {
         res.json(error.message);
     }
