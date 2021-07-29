@@ -43,21 +43,25 @@ router.post('/upload_csv/', async (req, res) => {
             })
             .on("data", async (row) => {
                 try {
-                    let p_id = row[0];
-                    let product_id = row[1];
-                    let product_type = row[2];
-                    let quantity = row[3];
-                    let finishing_size = row[4];
-                    let printed_pages = row[5];
-                    let stock = row[6];
-                    let cover = row[7];
-                    let lamination = row[8];
-                    let one_day = row[9];
-                    let two_day = row[10];
-                    let three_day = row[11];
-                    let seven_day = row[12];
-                    let vat = row[13];
-                    result = await pool.query('INSERT INTO "product_options" (p_id,product_id,product_type,quantity,finishing_size,printed_pages,stock,cover,lamination,one_day,two_day,three_day,seven_day,vat) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)', [p_id, product_id, product_type, quantity, finishing_size, printed_pages, stock, cover, lamination, one_day, two_day, three_day, seven_day, vat]);
+                    if (row[0] == 'P ID') {
+
+                    } else {
+                        let p_id = row[0];
+                        let product_id = row[1];
+                        let product_type = row[2];
+                        let quantity = row[3];
+                        let finishing_size = row[4];
+                        let printed_pages = row[5];
+                        let stock = row[6];
+                        let cover = row[7];
+                        let lamination = row[8];
+                        let one_day = row[9];
+                        let two_day = row[10];
+                        let three_day = row[11];
+                        let seven_day = row[12];
+                        let vat = row[13];
+                        result = await pool.query('INSERT INTO "product_options" (p_id,product_id,product_type,quantity,finishing_size,printed_pages,stock,cover,lamination,one_day,two_day,three_day,seven_day,vat) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)', [p_id, product_id, product_type, quantity, finishing_size, printed_pages, stock, cover, lamination, one_day, two_day, three_day, seven_day, vat]);
+                    }
                 } catch (error) {
                     console.log("catch error-", error);
                     res.status(500).send({
@@ -66,7 +70,6 @@ router.post('/upload_csv/', async (req, res) => {
                 }
             })
             .on("end", async () => {
-                const users = await pool.query('DELETE FROM "product_options" WHERE id = "P ID"', [id]);
                 if (result.rowCount >= 1) {
                     res.json({
                         success: true,
