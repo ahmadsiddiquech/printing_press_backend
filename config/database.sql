@@ -1,6 +1,7 @@
 CREATE DATABASE printing_press;
 ----------------------------------------------------------
 ----------------------------------------------------------
+
 CREATE TABLE users(
     id serial primary key,
     first_name varchar(255),
@@ -12,9 +13,9 @@ CREATE TABLE users(
     active int DEFAULT 0
 );
 
+----------------------------------------------------------
+----------------------------------------------------------
 
-----------------------------------------------------------
-----------------------------------------------------------
 CREATE TABLE admin(
     id serial primary key,
     first_name varchar(255),
@@ -27,6 +28,7 @@ CREATE TABLE admin(
 
 ----------------------------------------------------------
 ----------------------------------------------------------
+
 CREATE TABLE categories(
     id serial primary key,
     category varchar(255),
@@ -35,9 +37,9 @@ CREATE TABLE categories(
     active int DEFAULT 0
 );
 
+----------------------------------------------------------
+----------------------------------------------------------
 
-----------------------------------------------------------
-----------------------------------------------------------
 CREATE TABLE subcategories(
     id serial primary key,
     category_id int,
@@ -49,6 +51,7 @@ CREATE TABLE subcategories(
 
 ----------------------------------------------------------
 ----------------------------------------------------------
+
 CREATE TABLE finishingoptions(
     id serial primary key,
     subcategory_id int,
@@ -59,6 +62,7 @@ CREATE TABLE finishingoptions(
 
 ----------------------------------------------------------
 ----------------------------------------------------------
+
 CREATE TABLE additionaloptions(
     id serial primary key,
     subcategory_id int,
@@ -124,6 +128,7 @@ CREATE TABLE foldingstyle(
 
 ----------------------------------------------------------
 ----------------------------------------------------------
+
 CREATE TABLE products(
     id serial primary key,
     category_id int,
@@ -139,6 +144,7 @@ CREATE TABLE products(
 
 ----------------------------------------------------------
 ----------------------------------------------------------
+
 CREATE TABLE product_finishingoption(
     id serial primary key,
     product_id int,

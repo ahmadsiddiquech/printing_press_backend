@@ -477,6 +477,76 @@ router.post('/product_prices/', async (req, res) => {
     }
 });
 
+router.post('/product_by_product_id/', async (req, res) => {
+    try {
+        const p_turnaround = req.body.p_turnaround;
+        const product_id = req.body.product_id;
+        if (p_turnaround == "one_day") {
+            const f_options = await pool.query(`SELECT one_day as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
+            if (f_options.rowCount >= 1) {
+                res.json({
+                    success: true,
+                    message: "",
+                    data: f_options.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "Record Not Found",
+                    data: ""
+                });
+            }
+        } else if (p_turnaround == "two_day") {
+            const f_options = await pool.query(`SELECT two_day as price* FROM "product_options" WHERE product_id = $1`, [product_id]);
+            if (f_options.rowCount >= 1) {
+                res.json({
+                    success: true,
+                    message: "",
+                    data: f_options.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "Record Not Found",
+                    data: ""
+                });
+            }
+        } else if (p_turnaround == "three_day") {
+            const f_options = await pool.query(`SELECT three_day as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
+            if (f_options.rowCount >= 1) {
+                res.json({
+                    success: true,
+                    message: "",
+                    data: f_options.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "Record Not Found",
+                    data: ""
+                });
+            }
+        } else if (p_turnaround == "seven_day") {
+            const f_options = await pool.query(`SELECT seven_day as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
+            if (f_options.rowCount >= 1) {
+                res.json({
+                    success: true,
+                    message: "",
+                    data: f_options.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "Record Not Found",
+                    data: ""
+                });
+            }
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
 // users registrtion api's end
 
 function validateProduct(user) {
