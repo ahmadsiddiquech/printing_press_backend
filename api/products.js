@@ -11,6 +11,9 @@ const front_server_url = "http://localhost:4200/";
 
 // users registrtion api's start
 
+// Extended: https://swagger.io/specification/#infoObject
+
+
 router.get('/', async (req, res) => {
     try {
         const users = await pool.query(`SELECT products.*,categories.category,subcategories.name as subcategory FROM "products" 
@@ -330,68 +333,49 @@ router.post('/product_quantities/', async (req, res) => {
         const p_cover = req.body.p_cover;
         const p_lamination = req.body.p_lamination;
         const p_turnaround = req.body.p_turnaround;
-        if (p_turnaround == "one_day") {
-            f_options = await pool.query(`SELECT one_day as price,quantity FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 order by one_day asc`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "two_day") {
-            f_options = await pool.query(`SELECT two_day as price,quantity FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 order by two_day asc`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "three_day") {
-            f_options = await pool.query(`SELECT three_day as price,quantity FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 order by three_day asc`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "seven_day") {
-            f_options = await pool.query(`SELECT seven_day as price,quantity FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 order by seven_day asc`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
+        f_options = await pool.query(`SELECT ` + p_turnaround + ` as price,quantity FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 order by one_day asc`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
         }
 
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.post('/product_complete_prices/', async (req, res) => {
+    try {
+
+        const id = req.body.id;
+        const f_size = req.body.f_size;
+        const p_page = req.body.p_page;
+        const p_stock = req.body.p_stock;
+        const p_cover = req.body.p_cover;
+        const p_lamination = req.body.p_lamination;
+        const f_options = await pool.query(`SELECT one_day,two_day,three_day,seven_day,quantity,vat,product_id FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 ORDER BY quantity ASC`, [id, f_size, p_page, p_stock, p_cover, p_lamination]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
 
     } catch (error) {
         res.json(error.message);
@@ -409,68 +393,20 @@ router.post('/product_prices/', async (req, res) => {
         const p_lamination = req.body.p_lamination;
         const p_turnaround = req.body.p_turnaround;
         const p_quantity = req.body.p_quantity;
-        if (p_turnaround == "one_day") {
-            const f_options = await pool.query(`SELECT one_day as price,vat,product_id FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 and quantity = $7`, [id, f_size, p_page, p_stock, p_cover, p_lamination, p_quantity]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "two_day") {
-            const f_options = await pool.query(`SELECT two_day as price,vat,product_id FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 and quantity = $7`, [id, f_size, p_page, p_stock, p_cover, p_lamination, p_quantity]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "three_day") {
-            const f_options = await pool.query(`SELECT three_day as price,vat,product_id FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 and quantity = $7`, [id, f_size, p_page, p_stock, p_cover, p_lamination, p_quantity]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "seven_day") {
-            const f_options = await pool.query(`SELECT seven_day as price,vat,product_id FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 and quantity = $7`, [id, f_size, p_page, p_stock, p_cover, p_lamination, p_quantity]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
+        const f_options = await pool.query(`SELECT ` + p_turnaround + ` as price,vat,product_id FROM "product_options" WHERE p_id = $1 and finishing_size = $2 and printed_pages = $3 and stock = $4 and cover = $5 and lamination = $6 and quantity = $7`, [id, f_size, p_page, p_stock, p_cover, p_lamination, p_quantity]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
         }
-
 
     } catch (error) {
         res.json(error.message);
@@ -481,67 +417,21 @@ router.post('/product_by_product_id/', async (req, res) => {
     try {
         const p_turnaround = req.body.p_turnaround;
         const product_id = req.body.product_id;
-        if (p_turnaround == "one_day") {
-            const f_options = await pool.query(`SELECT one_day as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "two_day") {
-            const f_options = await pool.query(`SELECT two_day as price* FROM "product_options" WHERE product_id = $1`, [product_id]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "three_day") {
-            const f_options = await pool.query(`SELECT three_day as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
-        } else if (p_turnaround == "seven_day") {
-            const f_options = await pool.query(`SELECT seven_day as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
-            if (f_options.rowCount >= 1) {
-                res.json({
-                    success: true,
-                    message: "",
-                    data: f_options.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    message: "Record Not Found",
-                    data: ""
-                });
-            }
+        const f_options = await pool.query(`SELECT ` + p_turnaround + ` as price,* FROM "product_options" WHERE product_id = $1`, [product_id]);
+        if (f_options.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: f_options.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
         }
+
     } catch (error) {
         res.json(error.message);
     }
