@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const users = await pool.query('SELECT id,first_name,last_name,email,role,active,image FROM "users" WHERE id = $1', [id]);
+        const users = await pool.query('SELECT id,first_name,last_name,email,mobile,telephone,role,active,image FROM "users" WHERE id = $1', [id]);
 
         if (users.rowCount >= 1) {
             users.rows[0].image = (users.rows[0].image == null || users.rows[0].image == '') ? `${front_server_url}assets/images/user_image.png` : `${front_server_url}uploads/images/${users.rows[0].image}`;
@@ -113,7 +113,7 @@ router.post('/', async (req, res) => {
             return;
         }
         user.password = hashSync(user.password, salt);
-        const users = await pool.query('INSERT INTO "users" (first_name,last_name,email,password,role) VALUES ($1,$2,$3,$4,$5) returning *', [user.first_name, user.last_name, user.email, user.password, user.role]);
+        const users = await pool.query('INSERT INTO "users" (first_name,last_name,email,telephone,mobile,password,role) VALUES ($1,$2,$3,$4,$5) returning *', [user.first_name, user.last_name, user.email, user.telephone, user.mobile, user.password, user.role]);
         if (users.rowCount >= 1) {
             delete users.rows[0]["password"];
             res.json({

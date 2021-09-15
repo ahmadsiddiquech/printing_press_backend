@@ -13,6 +13,12 @@ CREATE TABLE users(
     active int DEFAULT 0
 );
 
+ALTER TABLE users
+ADD COLUMN telephone varchar(255);
+
+ALTER TABLE users
+ADD COLUMN mobile varchar(255);
+
 ----------------------------------------------------------
 ----------------------------------------------------------
 
@@ -174,3 +180,21 @@ CREATE TABLE product_options(
 
 ALTER TABLE product_options
 ALTER COLUMN p_id TYPE varchar(255);
+
+---------------------------------------------------------
+---------------------------------------------------------
+
+CREATE TABLE user_addresses(
+    id serial primary key,
+    user_id varchar(255),
+    contact_name varchar(255),
+    company_name varchar(255),
+    phone varchar(255),
+    address varchar(255),
+    state varchar(255),
+    postcode varchar(255),
+    country varchar(255),
+    billing_address varchar(255),
+    delivery_address varchar(255)
+);
+

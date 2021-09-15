@@ -107,10 +107,10 @@ router.put('/:id', async (req, res) => {
         const id = req.params.id;
         var user = req.body;
 
-        // var cols = [];
-        // for (const [key, value] of Object.entries(user)) {
-        //     cols.push(key + " = '" + value + "'");
-        // }
+        var cols = [];
+        for (const [key, value] of Object.entries(user)) {
+            cols.push(key + " = '" + value + "'");
+        }
         const update = await pool.query("UPDATE products SET " + cols.join(', ') + " WHERE id = $1 returning *", [id]);
         // const update = await pool.query('UPDATE products SET category_id = $1, subcategory_id = $2, name = $3, price = $4, description = $5, active = $6 WHERE id = $7 returning *',[user.category_id,user.subcategory_id,user.name,user.price,user.description,user.active,id]);
         if (update.rowCount >= 1) {
