@@ -198,3 +198,39 @@ CREATE TABLE user_addresses(
     delivery_address varchar(255)
 );
 
+---------------------------------------------------------
+---------------------------------------------------------
+
+CREATE TABLE orders(
+    id serial primary key,
+    user_id varchar(255),
+    billing_address integer,
+    delivery_address integer,
+    total_price varchar(255),
+    order_status varchar(255),
+    order_date varchar(255),
+);
+
+ALTER TABLE orders
+DROP billing_address;
+
+ALTER TABLE orders
+ADD COLUMN billing_address integer;
+
+---------------------------------------------------------
+---------------------------------------------------------
+
+CREATE TABLE order_products(
+    id serial primary key,
+    order_id integer,
+    product_id varchar(255),
+    turnaround varchar(255),
+    product_design varchar(255)
+);
+
+ALTER TABLE order_products
+DROP order_id;
+
+ALTER TABLE order_products
+ADD COLUMN order_id integer;
+

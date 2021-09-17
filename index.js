@@ -52,6 +52,7 @@ const paperweightRoutes = require('./api/paperweight.js');
 const productoptionsRoutes = require('./api/productoptions.js');
 const productsRoutes = require('./api/products.js');
 const addressRoutes = require('./api/address.js');
+const ordersRoutes = require('./api/orders.js');
 
 app.use('/api/users', usersRoutes);
 app.use('/api/admin', adminRoutes);
@@ -66,6 +67,7 @@ app.use('/api/papertype', papertypeRoutes);
 app.use('/api/paperweight', paperweightRoutes);
 app.use('/api/productoptions', productoptionsRoutes);
 app.use('/api/address', addressRoutes);
+app.use('/api/orders', ordersRoutes);
 
 app.use('/api/products', productsRoutes);
 
