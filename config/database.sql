@@ -206,6 +206,9 @@ CREATE TABLE orders(
     user_id varchar(255),
     billing_address integer,
     delivery_address integer,
+    delivery varchar(255),
+    items_price varchar(255),
+    delivery_fee varchar(255),
     total_price varchar(255),
     order_status varchar(255),
     order_date varchar(255),
@@ -216,6 +219,9 @@ DROP billing_address;
 
 ALTER TABLE orders
 ADD COLUMN billing_address integer;
+
+ALTER TABLE orders
+ADD COLUMN delivery varchar(255);
 
 ---------------------------------------------------------
 ---------------------------------------------------------

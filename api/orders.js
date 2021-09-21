@@ -20,7 +20,7 @@ router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;
         // const users = await pool.query(`SELECT * FROM "orders" WHERE orders.user_id = $1`, [id]);
-        const users = await pool.query(`SELECT orders.*,b.contact_name,b.company_name,b.address,b.state,b.postcode,b.phone,b.country,d.contact_name d_contact_name,d.company_name d_company_name,d.address d_address,d.state d_state,d.postcode d_postcode,d.phone d_phone,d.country d_country FROM "orders" LEFT JOIN "user_addresses" as b ON orders.billing_address = b.id LEFT JOIN "user_addresses" as d ON orders.delivery_address = d.id WHERE orders.user_id = $1`, [id]);
+        const users = await pool.query(`SELECT orders.*,b.contact_name,b.company_name,b.address,b.state,b.postcode,b.phone,b.country,d.contact_name d_contact_name,d.company_name d_company_name,d.address d_address,d.state d_state,d.postcode d_postcode,d.phone d_phone,d.country d_country FROM "orders" LEFT JOIN "user_addresses" as b ON orders.billing_address = b.id LEFT JOIN "user_addresses" as d ON orders.delivery_address = d.id WHERE orders.user_id = $1 ORDER BY orders.id desc`, [id]);
 
         if (users.rowCount >= 1) {
             res.json({
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
         var datetime = new Date();
         datetime = datetime.toISOString().slice(0, 10);
 
-        const users = await pool.query('INSERT INTO "orders" (user_id,delivery_address,billing_address,total_price,order_status,order_date) VALUES ($1,$2,$3,$4,$5,$6) returning *', [user.user_id, user.billing_address, user.delivery_address, user.total_price, 'Pending', datetime]);
+        const users = await pool.query('INSERT INTO "orders" (user_id,delivery_address,billing_address,delivery,items_price,delivery_fee,total_price,order_status,order_date) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) returning *', [user.user_id, user.billing_address, user.delivery_address, user.delivery, user.items_price, user.delivery_fee, user.total_price, 'Pending', datetime]);
 
 
         if (users.rowCount >= 1) {
