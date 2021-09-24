@@ -4,17 +4,12 @@ const pool = require('../config/db.js');
 const Joi = require('joi');
 
 const router = express.Router();
-const upload_url = "E:/Angular/printingshop/uploads/images/";
+const upload_url = "E:/Angular/printingshop/uploads/design_pdf/";
 const front_server_url = "http://localhost:4200/";
 
 //libraries end
 
 // users registrtion api's start
-
-// Extended: https://swagger.io/specification/#infoObject
-
-
-
 
 router.get('/:id', async (req, res) => {
     try {
@@ -32,6 +27,51 @@ router.get('/:id', async (req, res) => {
             res.json({
                 success: false,
                 message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
+router.put('/upload_designs/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const body = req.query;
+
+        let sampleFile;
+        let uploadPath;
+
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Record Not Updated",
+                data: ""
+            });
+        }
+
+        sampleFile = req.files.design;
+        uploadPath = upload_url + sampleFile.name;
+
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv(uploadPath, function (err) {
+            if (err) {
+                return res.status(500).send(err);
+            }
+        });
+
+        const update = await pool.query("UPDATE order_products SET product_design = $1 WHERE order_id = $2 and product_id = $3 and turnaround = $4", [sampleFile.name, id, body.product_id, body.product_turnaround]);
+        if (update.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "Record Updated Succesfully",
+                data: update.rows[0]
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Update Failed",
                 data: ""
             });
         }
