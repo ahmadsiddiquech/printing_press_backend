@@ -35,6 +35,33 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.get('/order_by_order_id/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const body = req.query;
+        // const users = await pool.query(`SELECT * FROM "orders" WHERE orders.user_id = $1`, [id]);
+        const users = await pool.query(`SELECT orders.*,b.contact_name,b.company_name,b.address,b.state,b.postcode,b.phone,b.country,d.contact_name d_contact_name,d.company_name d_company_name,d.address d_address,d.state d_state,d.postcode d_postcode,d.phone d_phone,d.country d_country FROM "orders" LEFT JOIN "user_addresses" as b ON orders.billing_address = b.id LEFT JOIN "user_addresses" as d ON orders.delivery_address = d.id WHERE orders.user_id = $1 AND orders.id = $2 ORDER BY orders.id desc`, [body.user_id, id]);
+        const data = users.rows[0];
+        const query = await pool.query(`SELECT product_options.* FROM "order_products" LEFT JOIN "product_options" ON order_products.product_id = product_options.product_id WHERE order_products.order_id = $1 ORDER BY order_products.id desc`, [data.id]);
+        data.products = query.rows;
+        if (users.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: data
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
 router.put('/upload_designs/:id', async (req, res) => {
     try {
         const id = req.params.id;
