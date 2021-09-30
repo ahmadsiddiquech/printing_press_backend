@@ -217,6 +217,28 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+router.delete('/delete_all/:id', async (req, res) => {
+    try {
+        const users = await pool.query('DELETE FROM "product_options"');
+        if (users.rowCount > 0) {
+            res.json({
+                success: true,
+                message: " All Options Deleted Succesfully",
+                data: ""
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Not Deleted",
+                data: ""
+            });
+        }
+
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
 // users registrtion api's end
 
 function validateProductoptions(user) {

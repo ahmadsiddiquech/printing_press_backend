@@ -11,6 +11,28 @@ const front_server_url = "http://localhost:4200/";
 
 // users registrtion api's start
 
+router.get('/', async (req, res) => {
+    try {
+        const users = await pool.query(`SELECT orders.*,users.first_name,users.last_name FROM "orders" LEFT JOIN "users" ON orders.user_id = users.id ORDER BY orders.id desc`);
+
+        if (users.rowCount >= 1) {
+            res.json({
+                success: true,
+                message: "",
+                data: users.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Record Not Found",
+                data: ""
+            });
+        }
+    } catch (error) {
+        res.json(error.message);
+    }
+});
+
 router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;

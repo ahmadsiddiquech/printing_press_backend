@@ -55,85 +55,6 @@ CREATE TABLE subcategories(
     active int DEFAULT 0
 );
 
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE finishingoptions(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE additionaloptions(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE unfoldedsize(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE printedsides(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE papertype(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE paperweight(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
-
-CREATE TABLE foldingstyle(
-    id serial primary key,
-    subcategory_id int,
-    name varchar(255),
-    price varchar(255),
-    active int DEFAULT 0
-);
-
-----------------------------------------------------------
-----------------------------------------------------------
 
 CREATE TABLE products(
     id serial primary key,
@@ -143,10 +64,13 @@ CREATE TABLE products(
     description varchar(255),
     image varchar(255),
     -- price varchar(255),
-    active int DEFAULT 0
+    active int DEFAULT 0,
+    featured int DEFAULT 0
 );
+ALTER TABLE products
+ADD COLUMN featured boolean DEFAULT false;
 
- ALTER TABLE products DROP price;
+ ALTER TABLE products DROP featured;
 
 ----------------------------------------------------------
 ----------------------------------------------------------
@@ -216,6 +140,9 @@ CREATE TABLE orders(
 
 ALTER TABLE orders
 DROP billing_address;
+
+ALTER TABLE orders
+ALTER COLUMN user_id int(11);
 
 ALTER TABLE orders
 ADD COLUMN billing_address integer;

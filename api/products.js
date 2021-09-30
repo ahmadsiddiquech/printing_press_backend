@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
             res.status(400).json(result.error.details[0].message);
             return;
         }
-        const users = await pool.query('INSERT INTO "products" (category_id,subcategory_id,name,description,active) VALUES ($1,$2,$3,$4,$5) returning *', [user.category_id, user.subcategory_id, user.name, user.description, user.active]);
+        const users = await pool.query('INSERT INTO "products" (category_id,subcategory_id,name,description,active,featured) VALUES ($1,$2,$3,$4,$5,$6) returning *', [user.category_id, user.subcategory_id, user.name, user.description, user.active, user.featured]);
         // if(users.rowCount >= 1){
         //     user.finishingoptions_id.forEach(element => {
         //         const f_result = pool.query('INSERT INTO "product_finishingoption" (product_id,finishingoptions_id) VALUES ($1,$2)',[users.rows[0].id,element]);
@@ -448,6 +448,7 @@ function validateProduct(user) {
         subcategory_id: Joi.number().required(),
         // finishingoptions_id: Joi.array().required(),
         description: Joi.string().required(),
+        featured: Joi.required(),
         active: Joi.number()
     })
     return schema.validate(user);
