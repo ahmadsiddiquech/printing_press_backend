@@ -9,7 +9,7 @@ const front_server_url = "http://localhost:4200/";
 
 //libraries end
 
-// users registrtion api's start
+// users registrtion api's startsss
 
 router.get('/', async (req, res) => {
     try {
