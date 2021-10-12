@@ -4,8 +4,6 @@ const pool = require('../config/db.js');
 const Joi = require('joi');
 
 const router = express.Router();
-const upload_url = "E:/Angular/printingshop/uploads/design_pdf/";
-const front_server_url = "http://localhost:4200/";
 
 //libraries end
 

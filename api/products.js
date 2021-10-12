@@ -4,8 +4,8 @@ const pool = require('../config/db.js');
 const Joi = require('joi');
 
 const router = express.Router();
-const upload_url = "E:/Angular/printingshop/uploads/images/";
-const front_server_url = "http://localhost:4200/";
+const upload_url = "https://printingpressweb.herokuapp.com/uploads/images/";
+const front_server_url = "https://printingpressweb.herokuapp.com/";
 
 //libraries end
 
