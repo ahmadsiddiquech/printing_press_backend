@@ -1,13 +1,15 @@
 //libraries
 const express = require('express');
 const pool = require('../config/db.js');
+const environment = require('../config/environment.js');
+const auth = require("../config/auth.js");
 
 const { sign } = require('jsonwebtoken');
 const { genSaltSync, hashSync, compareSync } = require('bcrypt');
 const Joi = require('joi');
 const router = express.Router();
-const upload_url = "https://printingpressweb.herokuapp.com/uploads/images/";
-const front_server_url = "https://printingpressweb.herokuapp.com/";
+const upload_url = environment.upload_url;
+const front_server_url = environment.front_server_url;
 
 //libraries end
 
@@ -31,7 +33,7 @@ const salt = genSaltSync(10);
  *        description: A successful response
  */
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const users = await pool.query('SELECT * FROM "users" ORDER BY id asc');
         if (users.rowCount >= 1) {
@@ -67,7 +69,7 @@ router.get('/', async (req, res) => {
  *        description: A successful response
  */
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
         const id = req.params.id;
         const users = await pool.query('SELECT id,first_name,last_name,email,mobile,telephone,role,active,image FROM "users" WHERE id = $1', [id]);
@@ -145,7 +147,7 @@ router.post('/', async (req, res) => {
  *        description: A successful response
  */
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     try {
         const id = req.params.id;
         var user = req.body;
@@ -185,7 +187,7 @@ router.put('/:id', async (req, res) => {
  *        description: A successful response
  */
 
-router.put('/upload_image/:id', async (req, res) => {
+router.put('/upload_image/:id', auth, async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -241,7 +243,7 @@ router.put('/upload_image/:id', async (req, res) => {
  *        description: A successful response
  */
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         const id = req.params.id;
         const users = await pool.query('DELETE FROM "users" WHERE id = $1', [id]);
@@ -290,10 +292,9 @@ router.post('/login', async (req, res) => {
         if (data.rowCount >= 1) {
             const result = compareSync(login.password, data.rows[0].password);
             if (result) {
-                data.rows[0].re
                 delete data.rows[0]["password"];
-                const jsontoken = sign({ result: result }, "hsah", {
-                    expiresIn: "1h"
+                const jsontoken = sign({ result: result }, environment.hash, {
+                    expiresIn: "2h"
                 });
                 res.json({
                     success: true,

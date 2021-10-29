@@ -2,10 +2,11 @@
 const express = require('express');
 const pool = require('../config/db.js');
 const Joi = require('joi');
+const environment = require('../config/environment.js');
 
 const router = express.Router();
-const upload_url = "https://printingpressweb.herokuapp.com/uploads/images/";
-const front_server_url = "https://printingpressweb.herokuapp.com/";
+const upload_url = environment.upload_url;
+const front_server_url = environment.front_server_url;
 
 //libraries end
 
